@@ -1,0 +1,90 @@
+This section defines the precise protocols, libraries, and developer tooling used to make NPC a standards-based, multi-agent, on-chain NPC engine that is interoperable by default (A2A), orchestrated predictably (ADK), grounded in safe structured tool use (Gemini function calling), and friendly to IDE automation via a pragmatic MCP bridge, all deployable on Somnia’s EVM testnet with explorer-backed verifiability.
+
+​
+ADK orchestration
+
+Google’s Agent Development Kit (ADK) is the orchestration backbone, chosen for its code-first, model-agnostic design and its emphasis on deterministic workflows that can be composed, traced, evaluated, and deployed without requiring managed services.
+​
+ADK provides workflow agents such as Sequential, Parallel, and Loop that allow a duel or quest to be implemented as a predictable pipeline, while still supporting LLM-driven adaptive routing when a behavior benefits from dynamic branching.​
+NPC composes four primary roles with ADK: Planner/Coach for multi-step goal decomposition, Perception for on-chain state assembly, Action/Tooler for ABI-bound execution, and Referee for policy checks and result attestation, each with their own tools, memory, and traces.​
+Tracing and evaluation are first-class, enabling stepwise and final-outcome scoring that directly feeds balancing, fairness tuning, and safety audits for match outcomes and quest completions.​
+ADK is container-friendly and runs locally or on any commodity host; while future scaling can target Vertex AI Agent Engine, NPC remains intentionally cost-free by running with local processes and the Gemini API via AI Studio keys.
+
+​
+A2A protocol surface
+
+A2A is the interop standard that lets external agents discover, authenticate, and coordinate tasks with NPC services over web-native transports, ensuring NPCs are not siloed within a single engine or vendor runtime.
+​
+Each NPC-facing service—such as a Referee or an archetype NPC—publishes an Agent Card that declares identity, capabilities, security schemes (API keys, OAuth2, or OpenID Connect), transports, and skill names so clients can negotiate how to interact.​
+Task invocation uses JSON-RPC 2.0 over HTTPS, with Server-Sent Events (SSE) for streaming status on long-running duels, raids, or multi-step quests, aligning to A2A’s guidance for async-first, enterprise-ready communication.​
+The gateway implements a minimal, idempotent lifecycle—open, status, update, finalize—returning correlation IDs, timestamps, and optional stream pointers, which is sufficient to compose multi-agent handoffs without exposing internals.​
+Security follows the scheme declared in the Agent Card and is enforced per call with per-task scoped tokens to ensure that a leaked credential can only affect a bounded match or quest window rather than global capabilities.
+
+​
+Gemini API tooling
+
+Inference and function selection use the Gemini API via Google AI Studio keys, enabling structured function calling so the model emits the exact tool name and parameters rather than free-form text, with all keys retained server-side.
+​
+Tools are generated from contract ABIs into function-calling schemas that declare parameter types, preconditions, and side-effect annotations, which the Action agent validates again against signer policies and on-chain allowlists before submitting a transaction.​
+The function-calling loop follows the standard pattern: declare tool schemas, receive a function call with arguments, execute the concrete RPC or on-chain call, and feed the typed result back to the model for the next decision step or a final natural-language explanation.​
+Google’s guidance is followed to keep the AI Studio API key in a server context rather than the browser, with client-side exploration limited to controlled prototypes that never sign transactions or access sensitive tools directly.​
+This structured approach neutralizes most hallucination risks by gating all write actions through deterministic validators, while still leveraging the model’s planning and heuristic search for complex multi-step objectives.
+
+​
+Model Context Protocol (MCP) bridge
+
+The optional MCP bridge exposes read-heavy development and debugging affordances to IDE agents so builders can query Somnia state, inspect receipts, and dry-run adapters without writing custom scripts for each step.
+​
+MCP offers a standard client-server pattern where NPC ships a minimal server with resources (indexed observations and logs), prompts (inspection and triage workflows), and tools (read-only queries and local simulations), transportable over stdio or HTTP.​
+By leaning on MCP’s JSON-RPC heritage and its broad tooling ecosystem, developers get a consistent interface for local validation and content generation without entangling the runtime’s A2A surfaces or on-chain signers.​
+Because MCP is not the execution path for matches, it can safely be restricted to read-only operations and simulations in dev profiles, leaving A2A plus ABI-bound tools as the exclusive channel for real transactions.
+
+​
+On-chain and explorer integration
+
+Somnia’s EVM compatibility lets NPC use standard JSON-RPC for eth_call, eth_sendRawTransaction, and log filtering, alongside Blockscout’s REST and Etherscan-compatible endpoints for fast indexed reads and receipt verification.
+​
+The engine’s read model prioritizes Blockscout REST for indexed history and address summaries and falls back to native RPC for low-level, time-sensitive checks, balancing responsiveness and correctness during live play.​
+Contract verification uses Blockscout’s verification API, ensuring ABIs and source are publicly auditable, while explorer API keys can be configured if an instance enforces request quotas beyond defaults.​
+Somnia network info and developer FAQs are embedded into the CLI templates so teams consistently hit the Shannon testnet RPC and explorer endpoints with the correct chain configuration during demos.
+
+​
+Schemas, IDs, and naming
+
+A2A Agent Cards include fields for name, version, description, capabilities, security schemes, transport URLs, and skill identifiers such as open_duel, submit_turn, or finalize_result, which map directly to JSON-RPC methods.
+​
+JSON-RPC payloads adhere to 2.0 semantics with error envelopes and correlation IDs, and all task methods are idempotent so that retries cannot cause duplicate on-chain writes or conflicting Referee states.​
+Gemini function tools are generated from ABIs into explicit schemas with examples for few-shot guidance, and required parameters are enforced before a tool is accepted to guard against partial or ambiguous invocations.​
+Blockscout responses and transaction hashes are carried through gateway responses so front-ends can deep-link to receipts, and Observation objects consistently reference block numbers and log indices to support deterministic replay.
+
+​
+Security and guardrails
+
+Agent Card security schemes are honored at the gateway, but authorization is scoped per task, and on-chain BehaviorController allows only explicitly permitted contract/method pairs, rate limits, and gas budgets regardless of tool approvals.
+​
+ADK workflows introduce guard functions and human-in-the-loop checkpoints at high-value steps, and all write-intent function calls from Gemini are re-validated against policy and signer configuration before transaction assembly.​
+Keys for Gemini remain server-only, A2A credentials are rotated and bound to task IDs, and explorer confirmations are required for finalize semantics, ensuring an on-chain source of truth for matches and quests.
+
+​
+Testing and conformance
+
+A2A conformance is validated by checking Agent Card schema validity, JSON-RPC method contracts, SSE behavior for streaming, and correct handling of task states across retries and network interruptions.
+​
+ADK pipelines are covered by evaluation harnesses that score both trajectory steps and final outcomes so regressions in planning or action tools are caught during CI before hitting testnet.​
+Gemini tool schemas are exercised with end-to-end function-calling codelabs patterns, confirming correct parameterization, error propagation, and re-entry with updated context in multi-step flows.​
+Explorer-backed tests assert that every finalize call corresponds to a confirmed transaction and an indexed receipt with expected topics, ensuring verifiability for judging and community audits.
+
+​
+Developer tooling and DX
+
+The SDKs include generators that turn ABIs into Gemini tool declarations, JSON-RPC stubs, and A2A method bindings so that new contracts or adapters can be added without bespoke glue code.
+​
+The CLI publishes Agent Cards, scaffolds gateway endpoints, verifies contracts via explorer APIs, and writes environment files with Somnia network info and explorer base URLs for a smooth out-of-the-box workflow.​
+Documentation links and quickstarts reference ADK concepts, A2A specifications, Gemini function-calling patterns, and MCP architecture pages, giving developers authoritative references from within the repo.
+
+​
+Why this stack works together
+
+ADK focuses on determinism, modularity, and evaluation, A2A standardizes interop and async tasking, Gemini provides safe structured tool use, MCP enhances developer ergonomics, and Somnia plus Blockscout deliver EVM execution and verifiability at scale.
+​
+The combination yields an engine where agents remain discoverable and composable, every on-chain action is explicit and auditable, and third-party games can integrate through clean ABIs and published Agent Cards without vendor lock-in.

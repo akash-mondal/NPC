@@ -1,0 +1,253 @@
+Here is the Product overview and requirements for Non Playble Contract (NPC), a genre‑agnostic, A2A‑native, ADK‑orchestrated agentic NPC engine for Somnia that uses the Gemini API via Google AI Studio keys for planning and tool calling while remaining fully compatible with on‑chain execution and external games.​
+The goal is to standardize how autonomous NPCs perceive game state, decide safely, interoperate with other agents, and submit verifiable transactions on Somnia’s EVM testnet, without requiring paid Vertex services and while remaining open to any genre or third‑party game contract.
+
+​
+Purpose
+
+NPC provides a reusable runtime and contract kit that lets developers plug autonomous NPCs into their games by either implementing a minimal adapter on their own contracts or by deploying template contracts for duels, quests, and marketplaces to prototype quickly.
+​
+The engine orients around three foundations: ADK for multi‑agent orchestration and tracing, A2A for interoperability and asynchronous task lifecycles, and Gemini API function‑calling for structured tooling with strict preconditions and schemas.​
+It is designed so any Somnia game can discover NPC capabilities via an Agent Card, request tasks over JSON‑RPC with SSE status, and verify outcomes on Blockscout with on‑chain receipts.
+
+​
+Personas
+
+    Game developer: integrates NPCs by choosing adapters for existing contracts or deploying the provided templates, configuring tools/ABIs for their domain, and controlling risk budgets and policies.
+
+​
+
+Systems designer: defines behaviors, observation schemas, and fairness rules in the Referee/Policy components without committing to a specific genre, enabling reuse across arenas, quests, crafting, or social sims.
+
+​
+
+Player or creator: instantiates NPCs with custom skills and constraints, relies on transparent on‑chain receipts, and can interoperate with other A2A‑compliant agents and services in the ecosystem.
+
+    ​
+
+Goals
+
+    Interoperable NPCs: every NPC exposes an A2A Agent Card and implements the task lifecycle for open_duel, submit_turn, finalize_result, and quest actions with streaming status.
+
+​
+
+Safe on‑chain actions: all write operations originate from explicit Gemini function calls bound to ABI‑derived schemas and are permitted by BehaviorController policies and allowlists.
+
+​
+
+Verifiable outcomes: each match or quest emits events and receipts consumable via Blockscout APIs and Somnia explorer, with explorer‑visible transactions linked from the dApp.
+
+    ​
+
+Non‑goals
+
+    Managed hosting: no dependency on Vertex AI Agent Engine or paid Google Cloud products; all orchestration runs on developer‑hosted containers or serverless of choice.
+
+​
+
+Closed agent protocols: the system will not rely on proprietary agent interop and will adhere to A2A discovery, security schemes, JSON‑RPC, and SSE where applicable.
+
+​
+
+Genre lock‑in: templates are examples, not mandates; adapters and interfaces remain generic to accommodate new mechanics without refactoring core runtime.
+
+    ​
+
+High‑level capabilities
+
+    BYO‑contract integration: implement a minimal IGameAction or IQuestAction interface and register your adapter so NPCs can call into custom logic using the same tools and policies.
+
+​
+
+Template contracts: ready‑to‑use Arena and Quest templates with escrow, timeouts, receipts, and payouts for rapid prototyping on the Somnia Shannon testnet.
+
+​
+
+Multi‑agent runtime: ADK‑composed Planner, Perception, Action, and Referee agents coordinate via explicit workflows with tracing, retries, and guardrails.
+
+​
+
+A2A gateway: Agent Cards hosted at well‑known paths and JSON‑RPC endpoints for task submission, with SSE updates for long‑running interactions.
+
+​
+
+Gemini function calling: ABI‑to‑tool schema generation and strict function calls for on‑chain reads/writes, with server‑side API key handling from Google AI Studio.
+
+    ​
+
+Constraints and assumptions
+
+    Inference: use Gemini API via AI Studio API keys, focusing on server‑side usage and avoiding client‑side key exposure beyond prototypes and demos.
+
+​
+
+Network: target Somnia Shannon testnet with EVM RPC and Blockscout explorer; all contract addresses and transactions must be testnet‑verifiable.
+
+​
+
+Interop: A2A compliance requires Agent Cards, security schemes aligned to OpenAPI patterns, and JSON‑RPC over HTTPS with optional SSE for streaming.
+
+    ​
+
+Functional requirements
+
+    A2A discovery and tasks: every agent exposes an Agent Card with identity, capabilities, transport, security schemes, and skills; tasks support statuses submitted/working/completed/failed with IDs and optional webhooks.
+
+​
+
+Contract kit: deploy NPCRegistry for identity/ownership/permissions, BehaviorController for rate limits and allowlists, and Arena/Quest templates for common loops including escrow and payouts.
+
+​
+
+ABI‑bound tools: generate function‑calling schemas from ABIs, including parameter types, preconditions, and side‑effect summaries for Gemini, and bind them to signer policies.
+
+​
+
+Read model: Perception agent consumes explorer/RPC data to materialize Observations with bounded size and fields tailored to the game’s adapter/ABI surface.
+
+​
+
+Planner orchestration: ADK workflows map high‑level goals into tool sequences with guard functions, backoff/retries, and escalation to human‑in‑the‑loop for high‑impact moves.
+
+​
+
+Referee enforcement: before any settlement on‑chain, Referee validates legal transitions, timeouts, and budget adherence, returning a signed or attested result payload.
+
+​
+
+Verifiability: each interaction emits events that include participants, rule version, and outcome hashes, with explorer links exposed via the dApp and REST client.
+
+​
+
+CLI and SDKs: provide commands to scaffold, deploy, publish Agent Cards, generate schemas, and run demos, plus TypeScript/Python SDKs for adapters and gateway clients.
+
+    ​
+
+Non‑functional requirements
+
+    Performance: task submission to initial response should be sub‑second for read operations and under practical RPC latency for writes, with streaming updates for long tasks via SSE.
+
+​
+
+Reliability: idempotent task endpoints with durable task IDs and retry semantics at least once for network failures, avoiding duplicate on‑chain writes through nonce and policy checks.
+
+​
+
+Observability: end‑to‑end tracing across ADK workflows, tool calls, and chain transactions, plus explorer‑backed health checks and confirmation tracking.
+
+​
+
+Interoperability: strict adherence to A2A Agent Card schema and JSON‑RPC 2.0 payloads to ensure compatibility with external agents and orchestrators.
+
+    ​
+
+External dependencies
+
+    A2A specifications: Agent Card format, security schemes, task lifecycle, JSON‑RPC transport, and SSE streaming conventions.
+
+​
+
+ADK libraries: core orchestration, agent composition, tracing, and deployment helpers in open‑source repositories.
+
+​
+
+Gemini API: server‑side usage of Google AI Studio keys, function calling, and code examples from official docs and quickstarts.
+
+​
+
+Somnia platform: network configuration, RPC endpoints, explorer APIs, and developer FAQs for the Shannon testnet.
+
+    ​
+
+Compatibility and integrations
+
+    Somnia EVM compatibility permits standard Ethereum JSON‑RPC, ABI tooling, and Blockscout APIs, enabling a conventional web3 toolchain with minimal bespoke work.
+
+​
+
+The A2A gateway can interoperate with any A2A‑compliant orchestrator or agent, making NPCs discoverable and usable beyond the engine’s reference dApp.
+
+​
+
+ADK’s model‑agnostic design allows substituting or augmenting Gemini with other LLMs in the future without altering the on‑chain or A2A surfaces.
+
+    ​
+
+Security and trust
+
+    Agent Card security: serve over HTTPS with modern TLS and consider signed Agent Cards to prevent tampering while avoiding credentials in the document.
+
+​
+
+AuthN/AuthZ: follow Agent Card security schemes such as API keys or OAuth for A2A, and enforce per‑task scoped tokens and allowlists at the gateway.
+
+​
+
+On‑chain safety: BehaviorController enforces allowlisted contracts and methods, gas and frequency limits, and blocks unsafe calls even if a tool call is suggested by the model.
+
+​
+
+Key management: keep Gemini API keys server‑side and do not expose them in clients except for controlled demos per Google guidance.
+
+    ​
+
+Data and artifacts
+
+    Agent Cards: JSON documents describing identity, capabilities, transports, security, and skills hosted at well‑known paths for discovery.
+
+​
+
+Observations: normalized snapshots of relevant on‑chain and off‑chain state, bounded for context efficiency and derived from explorer/RPC clients.
+
+​
+
+Receipts: on‑chain events summarizing rulesets, participants, outcomes, and settlement references, queryable via Blockscout REST APIs.
+
+    ​
+
+KPIs and success criteria
+
+    Time‑to‑first‑NPC: under 15 minutes from “npc init” to running a duel or quest on the Shannon testnet with visible receipts in the explorer.
+
+​
+
+Interop coverage: pass an A2A conformance checklist including Agent Card validation, task lifecycle correctness, and JSON‑RPC payload verification.
+
+​
+
+Safety incidents: zero unauthorized contract calls under default policy with BehaviorController allowlists and schema‑validated function calls.
+
+​
+
+Developer adoption: at least two BYO‑contract demos using the adapter interface within the submission, confirming genre‑agnostic integration.
+
+    ​
+
+Risks and mitigations
+
+    Tool misuse or hallucinated calls: mitigate by using Gemini function calling with strict schemas, precondition checks, and policy enforcement before signing.
+
+​
+
+Interop ambiguity: rely on A2A’s Agent Card, task semantics, and JSON‑RPC 2.0 to avoid custom message formats and improve compatibility.
+
+​
+
+Network instability: design idempotent tasks with retries and confirmation polling via explorer APIs and RPC fallbacks.
+
+    ​
+
+Deliverables in this phase
+
+    Public repository containing the Product overview and requirements, A2A Agent Card templates, adapter interface definitions, and ABI‑to‑tool schema generator specs.
+
+​
+
+Shannon testnet readiness notes with network info, explorer endpoints, and faucet/explorer integration steps for end‑to‑end verification.
+
+    ​
+
+Hackathon alignment
+
+NPC satisfies the requirement for a working, deployed Somnia testnet dApp with public code, on‑chain addresses, and a concise, verifiable demo that emphasizes originality, technical complexity, completeness, and usability.
+​
+The approach showcases agent interoperability via A2A, robust orchestration with ADK, and safe on‑chain execution via ABI‑bound Gemini tools, all while remaining genre‑agnostic and developer‑first.

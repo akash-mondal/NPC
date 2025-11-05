@@ -1,0 +1,248 @@
+Somnia network and explorer
+
+    Somnia Docs (landing): https://docs.somnia.network
+
+​
+
+Network info (RPC, chain IDs, endpoints): https://docs.somnia.network/developer/network-info
+
+​
+
+Somnia Shannon Testnet: https://testnet.somnia.network
+
+​
+
+Shannon Explorer (web): https://shannon-explorer.somnia.network
+
+​
+
+Explorer API docs (OpenAPI): https://shannon-explorer.somnia.network/api-docs
+
+​
+
+Faucet (Google Cloud): https://cloud.google.com/application/web3/faucet/somnia/shannon
+
+​
+
+Chain settings (Chainlist 50312): https://chainlist.org/chain/50312
+
+    ​
+
+Blockscout (explorer) APIs and verification
+
+    Blockscout Docs (index): https://docs.blockscout.com
+
+​
+
+Blockscout Developer APIs (REST, Etherscan-compatible): https://docs.blockscout.com/devs/apis
+
+​
+
+REST API overview (blog): https://www.blog.blockscout.com/blockscout-rest-api
+
+​
+
+Contract verification API: https://docs.blockscout.com/devs/verification/blockscout-smart-contract-verification-api
+
+​
+
+API keys (when enforced): https://docs.blockscout.com/using-blockscout/my-account/api-keys
+
+    ​
+
+A2A protocol (Agent-to-Agent)
+
+    A2A official specification: https://a2a-protocol.org/latest/specification/
+
+​
+
+A2A spec (alt mirror v0.1.0): https://www.a2aprotocol.net/docs/specification
+
+​
+
+A2A overview (announcement): https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/
+
+​
+
+A2A enterprise/security features: https://a2a-protocol.org/latest/topics/enterprise-ready/
+
+​
+
+A2A GitHub (reference/SDKs/examples): https://github.com/a2aproject/A2A
+
+​
+
+A2A getting started codelab: https://codelabs.developers.google.com/intro-a2a-purchasing-concierge
+
+    ​
+
+Google ADK (Agent Development Kit)
+
+    ADK docs (core concepts, agents, workflows, tracing): https://google.github.io/adk-docs/
+
+​
+
+ADK “Overview” in Agent Builder docs: https://docs.cloud.google.com/agent-builder/agent-development-kit/overview
+
+​
+
+Develop an ADK agent (Agent Engine dev guide): https://docs.cloud.google.com/agent-builder/agent-engine/develop/adk
+
+​
+
+ADK announcement/overview: https://developers.googleblog.com/en/agent-development-kit-easy-to-build-multi-agent-applications/
+
+​
+
+ADK docs repo (open-source): https://github.com/google/adk-docs
+
+    ​
+
+Gemini API (Google AI Studio)
+
+    Google AI for Developers (Gemini landing): https://ai.google.dev
+
+​
+
+AI Studio quickstart (API key workflow, server-side guidance): https://ai.google.dev/gemini-api/docs/ai-studio-quickstart
+
+​
+
+Using Gemini API keys (security, usage): https://ai.google.dev/gemini-api/docs/api-key
+
+​
+
+Function calling (define tools, structured calls): https://ai.google.dev/gemini-api/docs/function-calling
+
+​
+
+Codelab: function calling patterns E2E: https://codelabs.developers.google.com/codelabs/gemini-function-calling
+
+​
+
+Firebase AI Logic: Gemini function-calling guidance: https://firebase.google.com/docs/ai-logic/function-calling
+
+    ​
+
+Model Context Protocol (MCP) bridge (optional dev ergonomics)
+
+    MCP site (home): https://modelcontextprotocol.io
+
+​
+
+MCP architecture overview: https://modelcontextprotocol.io/docs/learn/architecture
+
+​
+
+MCP protocol overview/spec (2025-03-26): https://modelcontextprotocol.io/specification/2025-03-26/basic
+
+    ​
+
+EVM client libraries and tooling
+
+    Ethers v6 docs: https://docs.ethers.org/v6/
+
+​
+
+Hardhat docs (Getting Started): https://hardhat.org/docs/getting-started
+
+​
+
+Hardhat site (index): https://hardhat.org
+
+​
+
+Hardhat “Getting started” (alt, latest): https://hardhat.org/getting-started
+
+​
+
+Foundry (framework index): https://getfoundry.sh
+
+​
+
+Foundry GitHub: https://github.com/foundry-rs/foundry
+
+​
+
+Anvil (local EVM node) docs: https://getfoundry.sh/anvil/overview/
+
+​
+
+Foundry Book (Forge section): https://foundry-book.zksync.io/forge/overview
+
+​
+
+Viem docs (Getting Started): https://viem.sh/docs/getting-started
+
+​
+
+Viem docs (Clients & Transports): https://viem.sh/docs/clients/intro
+
+​
+
+Viem site (index): https://viem.sh
+
+    ​
+
+Contract libraries and templates
+
+    OpenZeppelin Contracts 4.x docs: https://docs.openzeppelin.com/contracts/4.x
+
+​
+
+OpenZeppelin Contracts 5.x docs (latest): https://docs.openzeppelin.com/contracts/5.x
+
+​
+
+OpenZeppelin Contracts Wizard: https://wizard.openzeppelin.com
+
+​
+
+OpenZeppelin Contracts (docs index): https://docs.openzeppelin.com/contracts
+
+​
+
+OpenZeppelin Contracts GitHub: https://github.com/OpenZeppelin/openzeppelin-contracts
+
+    ​
+
+JSON-RPC and payload standards
+
+    JSON-RPC 2.0 Specification: https://www.jsonrpc.org/specification
+
+​
+
+A2A JSON-RPC guidance (overview article): https://www.a2aprotocol.org/en/docs/json-rpc-2-0
+
+    ​
+
+Somnia dev workflow helpers
+
+    Developer FAQs (network/dev Q&A): https://docs.somnia.network/developer/deployment-and-production/support-and-community/developer-faqs
+
+​
+
+Local testing and forking: https://docs.somnia.network/developer/development-workflow/development-environment/local-testing-and-forking
+
+​
+
+Explorer API health and monitoring: https://docs.somnia.network/developer/deployment-and-production/explorer-api-health-and-monitoring
+
+​
+
+Ecosystem explorers overview: https://docs.somnia.network/developer/deployment-and-production/ecosystem/ecosystem-tools/explorers
+
+    ​
+
+A2A security and ops references
+
+    A2A security hardening (Red Hat): https://developers.redhat.com/articles/2025/08/19/how-enhance-agent2agent-security
+
+​
+
+A2A scope/core/security overview: https://zbrain.ai/understanding-the-a2a-protocol/
+
+​
+
+A2A security risks guide: https://live.paloaltonetworks.com/t5/community-blogs/safeguarding-ai-agents-an-in-depth-look-at-a2a-protocol-risks/ba-p/1235996
+​

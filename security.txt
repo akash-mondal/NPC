@@ -1,0 +1,112 @@
+This section defines how NPC will harden agent interactions end-to-end, adjudicate matches fairly, and operate reliably on Somnia, using A2A security controls, Gemini function-calling guardrails, on-chain policy contracts, and explorer-backed verification, with concrete runbooks for monitoring and incident response.
+
+​
+Threat model and boundaries
+
+NPC treats the A2A gateway, agent runtime, and on-chain contracts as separate trust zones, enforcing HTTPS/TLS on all A2A surfaces, server-side Gemini usage, and BehaviorController enforcement on-chain to block unsafe calls even if upstream layers are compromised.
+​
+Primary risks include Agent Card spoofing, credential theft, tool misuse via hallucinated calls, DoS on gateways, and explorer/RPC partial outages, each mitigated through TLS, scoped tokens, schema-validated tool calls, rate limits, and dual-source read models.
+
+​
+Identity and authentication (A2A)
+
+All A2A endpoints, including Agent Cards, are served over HTTPS with modern TLS, certificate validation, and pinned trust roots where feasible to prevent spoofing and MitM against agent communications.
+​
+Agent Cards declare security schemes (API keys or OAuth flows) and capability scopes; the gateway enforces per-task scoped credentials with time-bound lifetimes, rotation, and revocation to confine blast radius of leaked tokens.​
+For high-assurance integrations, mutual TLS between agents and the A2A gateway is supported to bind client identity at the transport layer in addition to application-layer tokens.
+
+​
+Authorization and least privilege
+
+Gateway authorization maps Agent Card scopes to specific task methods and parameters, rejecting calls outside declared capabilities and enforcing session-level rate limits and quotas to resist brute force or flooding.
+​
+On-chain, BehaviorController enforces allowlists of contract/method pairs, gas and frequency budgets, and cooldowns; transactions violating policy are reverted, making policy the final line of defense.​
+All inputs to task and tool endpoints are validated against strict JSON schemas and ABI types to neutralize injection, SSRF, or oversized payload attacks before reaching signers or contracts.
+
+​
+Key management and Gemini API security
+
+Gemini API keys are never exposed client-side; the runtime calls Gemini from a server context, with keys stored in environment variables or a secret manager and rotated periodically.
+​
+Key restrictions are applied where available (e.g., IP or referrer limits and API-scoped usage), and any suspected leakage triggers immediate rotation plus audit log review for anomalous usage.​
+All Gemini function-calling results are treated as untrusted until validated; the Action agent deterministically checks schema compliance, preconditions, and policy gates before executing any on-chain write.
+
+​
+Tool safety and function-calling guardrails
+
+ABI-to-tool schemas declare parameter types, invariants, and side-effect annotations, steering Gemini to prefer safe read-before-write patterns and enabling deterministic rejection of ill-typed or out-of-policy calls.
+​
+ADK workflows insert guard functions and, for high-stake moves, human-in-the-loop checkpoints, combining LLM planning with explicit execution control to reduce hallucination-induced side effects.​
+All write-intent tools are executed through a signer that revalidates nonce, gas, target, and policy alignment immediately prior to submission, preventing stale-plan execution.
+
+​
+Fairness, anti-cheese, and adjudication
+
+A Referee agent validates state transitions, timeouts, and rule versions, then finalizes results with receipts; illegal moves and timing violations are rejected with reasoned error codes for auditability.
+​
+Match and quest outcomes emit on-chain events with participants, rule version, and outcome hashes, enabling third parties to independently verify fairness via Blockscout APIs and explorer links.​
+Rate limits, cooldowns, and move budgets enforced in BehaviorController limit spammy tactics, while deterministic resolution rules and complete status streaming reduce disputes in competitive play.
+
+​
+Randomness and tie-breaking
+
+When randomness is required, adjudication favors deterministic tiebreakers or commit–reveal patterns recorded on-chain so outcomes are reproducible and verifiable post hoc.
+​
+Referee logic avoids opaque off-chain randomness by emitting sufficient event metadata to reconstruct decision paths, keeping competitive integrity auditable through explorer records.
+
+​
+Observability and telemetry
+
+The runtime correlates ADK traces, A2A task IDs, and transaction hashes so every planning step, tool invocation, and on-chain effect can be reconstructed across logs and the explorer.
+​
+Explorer-backed health checks monitor RPC and indexing freshness; the system tolerates partial Blockscout lag by falling back to native JSON-RPC for critical confirmations during demonstrations.​
+SSE streams from the A2A gateway provide real-time status updates, minimizing polling and surfacing intermediate adjudication steps for UIs and external orchestrators.
+
+​
+Monitoring runbooks and SLOs
+
+    Gateway SLOs: 99.9% availability for task.open/status/finalize, p95 < 300 ms for read-only status under nominal load, and bounded retries with exponential backoff for transient failures.
+
+​
+
+Explorer SLOs: confirm finalize semantics only on N confirmations or explorer-confirmed status, with alarms on lag or indexer degradation events surfaced by explorer health endpoints.
+
+​
+
+Capacity: preconfigure rate limits per IP and per API key with circuit breakers for burst traffic during tournaments, plus autoscaling of gateway workers on CPU/RPS thresholds.
+
+    ​
+
+Incident response
+
+For suspected credential compromise, immediately revoke per-task tokens, rotate Gemini API keys, invalidate stale Agent Card URLs, and trigger rate-limit clamps while analysis runs.
+​
+For explorer partial outages or lag, switch finalize checks to RPC-based confirmations and queue receipts for later indexer reconciliation, maintaining user-visible status via SSE.​
+For schema or tool misconfiguration causing bad executions, disable affected tools in the gateway, redeploy corrected ABI schemas, and re-run evaluation harnesses before re-enabling writes.
+
+​
+Compliance and conformance checks
+
+Validate Agent Cards against A2A schema, ensure JSON-RPC 2.0 envelopes and error semantics are correct, and exercise streaming on long tasks to pass A2A readiness criteria.
+​
+Verify contracts and ABIs through Blockscout verification APIs, ensuring public source and ABI availability for third-party audits and hackathon judging.​
+Document key handling, auth schemes, and rate limits explicitly in the repository to satisfy security review checklists common in A2A deployments.
+
+​
+Operations tooling
+
+Use Blockscout REST for indexed reads (transaction status, logs, address activity) and Etherscan-compatible endpoints for legacy tooling, with API keys configured if instance quotas require.
+​
+Track indexer states and lag with explorer health guidance, noting that head-to-genesis indexing can affect completeness and must be accounted for in dashboards and acceptance tests.​
+Publish Agent Cards at well-known paths with TLS and cache headers; monitor certificate expiry and enable mTLS where partners require stronger mutual identity guarantees.
+
+​
+Continuous evaluation and safety audits
+
+Leverage ADK evaluations to score plan trajectories and outcomes on regression runs, catching drift in behaviors and reducing the chance of unsafe emergent strategies.
+​
+Regularly pen-test A2A surfaces for schema bypasses, SSRF via URIs, and oversized payloads, and maintain an SBOM for the gateway/runtime to patch dependencies promptly.​
+Log all security-relevant events with tamper-evident storage and alerts on anomalies like repeated auth failures, unusual task patterns, or spikes in rejected tool calls.
+
+​
+
